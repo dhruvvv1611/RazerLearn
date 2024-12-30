@@ -29,11 +29,28 @@ export const authApi = createApi({
         }
       },
     }),
+    loadUser: builder.query({
+      query: () => ({
+        url: "profile",
+        method: "GET",
+      }),
+    }),
+    updateuser: builder.mutation({
+      query: (formData) => ({
+        url: "profile/update",
+        method: "PUT",
+        body: formData,
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
-export const { useRegisterUserMutation, useLoginUserMutation } = authApi;
+export const {
+  useRegisterUserMutation,
+  useLoginUserMutation,
+  useLoadUserQuery,
+  useUpdateuserMutation,
+} = authApi;
 
 export default authApi;
-
-

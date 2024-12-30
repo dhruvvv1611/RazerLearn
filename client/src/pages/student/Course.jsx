@@ -20,7 +20,7 @@ const Course = () => {
           </h1>
           <div className="flex items-center justify-between ">
             <div className="flex items-center gap-3 ">
-              <Avatar classNameh="h-8 w-8">
+              <Avatar className="h-8 w-8">
                 <AvatarImage
                   src="https://github.com/shadcn.png"
                   alt="@shadcn"
