@@ -28,9 +28,9 @@ const Profile = () => {
   const [updateUser, { isLoading: updateIsLoading, isError, isSuccess }] =
     useUpdateuserMutation();
 
-    useEffect(() => {
+  useEffect(() => {
     refetch();
-    }, [refetch]);
+  }, [refetch]);
 
   useEffect(() => {
     if (data?.user) {
