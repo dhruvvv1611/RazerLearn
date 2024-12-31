@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,15 +24,36 @@ import {
 } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLogoutUserMutation } from "@/features/api/authApi";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 
 const Navbar = () => {
-  const user = true;
+  const navigate = useNavigate();
+  const [logoutUser, { data, isSuccess }] = useLogoutUserMutation();
+
+  const logoutHandler = async () => {
+    await logoutUser();
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Logged out successfully");
+      navigate("/login");
+    }
+  }, [isSuccess, data]);
+
+  const {user} = useSelector((store)=> store.auth);
+  console.log(user);
 
   return (
     <div className="h-16 dark:bg-[#0a0a0a] bg-white border-b dark:border-b-gray-800 border-b-gray-200 fixed top-0 left-0 right-0 duration-300 z-10 ">
       <div className="max-w-7xl mx-auto hidden md:flex justify-between items-center gap-10 h-full ">
-        <h1 className="hidden md:block font-extrabold text-2xl">RazerLearn</h1>
+        <h1 className="hidden md:block font-extrabold text-2xl">
+          <Link to="/">RazerLearn</Link>
+        </h1>
         <div className="flex items-center gap-8">
           {user ? (
             <DropdownMenu>
@@ -56,7 +77,9 @@ const Navbar = () => {
                     {" "}
                     <Link to="profile">Edit Profile</Link>{" "}
                   </DropdownMenuItem>
-                  <DropdownMenuItem>Log out</DropdownMenuItem>
+                  <DropdownMenuItem onClick={logoutHandler}>
+                    Log out
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
                 {user?.role === "instructor" && (
                   <>
@@ -70,8 +93,8 @@ const Navbar = () => {
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-2">
-              <Button variant="outline">Login</Button>
-              <Button>Signup</Button>
+              <Link to="/login"><Button variant="outline">Login</Button></Link>
+              <Link to="/login"><Button>Register</Button></Link>
             </div>
           )}
           <DarkMode />
@@ -89,6 +112,11 @@ export default Navbar;
 
 const MobileNavbar = () => {
   const role = "instructor";
+  const logoutHandler = async () => {
+    await logoutUser();
+  };
+  
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -102,14 +130,16 @@ const MobileNavbar = () => {
       </SheetTrigger>
       <SheetContent className="flex flex-col">
         <SheetHeader className="flex flex-row items-center justify-between mt-2">
-          <SheetTitle>RazerLearn</SheetTitle>
+          <SheetTitle>
+            <Link to="/">RazerLearn</Link>
+          </SheetTitle>
           <DarkMode />
         </SheetHeader>
         <Separator className="mr-2" />
         <nav className="flex flex-col space-y-4">
-          <span>My Learning</span>
-          <span>Edit Profile</span>
-          <span>Logout</span>
+          <Link to="my-learning">My Learning</Link>
+          <Link to="profile">Edit Profile</Link>
+          <span onClick={logoutHandler}>Logout</span>
         </nav>
         {role === "instructor" && (
           <SheetFooter>

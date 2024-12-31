@@ -28,6 +28,10 @@ const Profile = () => {
   const [updateUser, { isLoading: updateIsLoading, isError, isSuccess }] =
     useUpdateuserMutation();
 
+    useEffect(() => {
+    refetch();
+    }, [refetch]);
+
   useEffect(() => {
     if (data?.user) {
       setName(data.user.name || "");
@@ -61,21 +65,18 @@ const Profile = () => {
   };
 
   if (isLoading) return <h1>Profile is loading...</h1>;
-  if (!data || !data.user) return <h1>Failed to load user data</h1>;
+  if (!data?.user) return <h1>Failed to load user data</h1>;
 
-  const { user } = data;
-
-  
-  
+  const user = data.user;
 
   return (
     <div className="max-w-4xl mx-auto px-4 my-24">
       <h1 className="font-bold text-2xl text-center md:text-left">Profile</h1>
       <div className="flex flex-col md:flex-row items-center md:items-start gap-8 my-5">
         <div className="flex flex-col items-center">
-          <Avatar className="w-24 h-24 md:w-34 md:h-34 mb-4  ">
-            <AvatarImage src={user.photoUrl} alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
+          <Avatar className="w-24 h-24 md:w-34 md:h-34 mb-4">
+            <AvatarImage src={user?.photoUrl} alt={user.name} />
+            <AvatarFallback>{user.name?.[0]?.toUpperCase()}</AvatarFallback>
           </Avatar>
         </div>
         <div>
@@ -99,7 +100,7 @@ const Profile = () => {
             <h2 className="font-semibold text-gray-900 dark:text-gray-300">
               Role:
               <span className="font-normal text-gray-700 dark:text-gray-300 ml-2">
-                {user.role.toUpperCase()}
+                {user.role?.toUpperCase()}
               </span>
             </h2>
           </div>
@@ -122,7 +123,6 @@ const Profile = () => {
                   <Label className="text-right">Name</Label>
                   <Input
                     type="text"
-                    defaultValue="Pedro Duarte"
                     className="col-span-3"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -153,8 +153,8 @@ const Profile = () => {
         </div>
       </div>
       <div>
-        <h1 className="font-medium text-lg ">Courses you are enrolled in</h1>
-        <div className="grid gird-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-5">
+        <h1 className="font-medium text-lg">Courses you are enrolled in</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-5">
           {user.enrolledCourses?.length === 0 ? (
             <h1>You haven't enrolled yet</h1>
           ) : (

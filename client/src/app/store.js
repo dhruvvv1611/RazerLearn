@@ -9,3 +9,11 @@ const store = configureStore({
 });
 
 export default store;
+
+const initialApp = async () => {
+  await store.dispatch(
+    authApi.endpoints.loadUser.initiate({}, { forceRefetch: true })
+  );
+};
+
+initialApp();
