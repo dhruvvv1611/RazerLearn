@@ -1,4 +1,4 @@
-import Course from "../models/courseModel.js"
+import Course from "../models/courseModel.js";
 
 export const createCourse = async (req, res) => {
   try {
@@ -15,6 +15,31 @@ export const createCourse = async (req, res) => {
 
     return res.status(201).json({ course, message: "Course created" });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to create course" });
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Failed to create course", success: false });
   }
 };
+
+export const getCreatorCourses = async (req, res) => {
+  try {
+    const userId = req.id;
+
+    const courses = await Course.find({ creator: userId });
+
+    if (!courses) {
+      return res
+        .status(404)
+        .json({ message: "No courses found", success: false });
+    }
+
+    return res.status(200).json({ courses });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Failed to fetch courses", success: false });
+  }
+};
+

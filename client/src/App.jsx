@@ -1,6 +1,5 @@
 import "./App.css";
 import { Login } from "./pages/Login";
-import Navbar from "./components/Navbar";
 import HeroSection from "./pages/student/HeroSection";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import MainLayout from "./layout/MainLayout";
@@ -11,6 +10,7 @@ import Sidebar from "./pages/admin/Sidebar";
 import Dashboard from "./pages/admin/Dashboard";
 import CourseTable from "./pages/admin/CourseTable";
 import AddCourse from "./pages/admin/AddCourse";
+import EditCourse from "./pages/admin/EditCourse";
 
 const appRouter = createBrowserRouter([
   {
@@ -43,17 +43,21 @@ const appRouter = createBrowserRouter([
         element: <Sidebar />,
         children: [
           {
-            path: "dashboard", // No leading slash
+            path: "dashboard", 
             element: <Dashboard />,
           },
           {
-            path: "course", // No leading slash
+            path: "course", 
             element: <CourseTable />,
           },
           {
             path: "course/create",
             element: <AddCourse />,
-          }
+          },
+          {
+            path: "course/edit/:courseId",
+            element: <EditCourse />,
+          },
         ],
       },
     ],
