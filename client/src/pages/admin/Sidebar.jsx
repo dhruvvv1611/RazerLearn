@@ -16,7 +16,7 @@ const Sidebar = () => {
             <h1>Dashboard</h1>
           </Link>
           <Link
-            to="/admin/courses"
+            to="/admin/course"
             className="flex items-center gap-2 hover:text-blue-600 transition-colors"
           >
             <SquareLibrary size={22} />

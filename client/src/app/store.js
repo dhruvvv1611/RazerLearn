@@ -1,11 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import rootReducer from "./rootReducer";
 import authApi from "@/features/api/authApi";
+import { courseApi } from "@/features/api/courseApi";
 
 const store = configureStore({
   reducer: rootReducer,
   middleware: (defaultMiddleware) =>
-    defaultMiddleware().concat(authApi.middleware),
+    defaultMiddleware().concat(authApi.middleware, courseApi.middleware),
 });
 
 export default store;

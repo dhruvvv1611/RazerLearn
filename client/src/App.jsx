@@ -10,6 +10,7 @@ import Profile from "./pages/student/Profile";
 import Sidebar from "./pages/admin/Sidebar";
 import Dashboard from "./pages/admin/Dashboard";
 import CourseTable from "./pages/admin/CourseTable";
+import AddCourse from "./pages/admin/AddCourse";
 
 const appRouter = createBrowserRouter([
   {
@@ -46,9 +47,13 @@ const appRouter = createBrowserRouter([
             element: <Dashboard />,
           },
           {
-            path: "courses", // No leading slash
+            path: "course", // No leading slash
             element: <CourseTable />,
           },
+          {
+            path: "course/create",
+            element: <AddCourse />,
+          }
         ],
       },
     ],
