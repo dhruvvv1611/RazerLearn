@@ -16,15 +16,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useEditCourseMutation } from "@/features/api/courseApi";
 import { Loader2 } from "lucide-react";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const CourseTab = () => {
+  const [editCourse, { data, isError, isLoading, isSuccess }] =
+    useEditCourseMutation();
   const navigate = useNavigate();
   const isPublished = true;
-  const isLoading = false;
   const [input, setInput] = React.useState({
     courseTitle: "",
     subTitle: "",
@@ -59,9 +62,27 @@ const CourseTab = () => {
     }
   };
 
-  const updateCourseHandler = () => {
-    console.log(input);
+  const updateCourseHandler = async () => {
+    const formData = new FormData();
+    formData.append("courseTitle", input.courseTitle);
+    formData.append("subTitle", input.subTitle);
+    formData.append("description", input.description);
+    formData.append("category", input.category);
+    formData.append("courseLevel", input.courseLevel);
+    formData.append("coursePrice", input.coursePrice);
+    formData.append("courseThumbnail", input.courseThumbnail);
+    await editCourse(formData).unwrap();
+    navigate("/admin/course");
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Course updated successfully" || data.message);
+    }
+    if (isError) {
+      toast.error("Something went wrong" || data.message);
+    }
+  }, [isSuccess, isError]);
   return (
     <div className="h-full overflow-y-auto ">
       <Card>
