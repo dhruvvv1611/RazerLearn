@@ -16,26 +16,50 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEditCourseMutation } from "@/features/api/courseApi";
+import {
+  useEditCourseMutation,
+  useGetCourseByIdQuery,
+} from "@/features/api/courseApi";
 import { Loader2 } from "lucide-react";
-
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 const CourseTab = () => {
+  const params = useParams();
+  const courseId = params.courseId;
+
   const [editCourse, { data, isError, isLoading, isSuccess }] =
     useEditCourseMutation();
   const navigate = useNavigate();
   const isPublished = true;
   const [input, setInput] = React.useState({
     courseTitle: "",
-    subTitle: "",
+    courseSubtitle: "",
     description: "",
     category: "",
     courseLevel: "",
     coursePrice: "",
   });
+
+  const { data: courseByIdData, isLoading: courseByIdLoading } =
+    useGetCourseByIdQuery(courseId);
+
+  useEffect(() => {
+    if (courseByIdData?.course) {
+      const course = courseByIdData.course;
+      {
+        setInput({
+          courseTitle: course.courseTitle,
+          courseSubtitle: course.courseSubtitle,
+          description: course.description,
+          category: course.category,
+          courseLevel: course.courseLevel,
+          coursePrice: course.coursePrice,
+        });
+      }
+    }
+  }, [courseByIdData]);
 
   const [thumbnailPreview, setThumbnailPreview] = React.useState(null);
 
@@ -65,13 +89,16 @@ const CourseTab = () => {
   const updateCourseHandler = async () => {
     const formData = new FormData();
     formData.append("courseTitle", input.courseTitle);
-    formData.append("subTitle", input.subTitle);
+    formData.append("courseSubtitle", input.courseSubtitle);
     formData.append("description", input.description);
     formData.append("category", input.category);
     formData.append("courseLevel", input.courseLevel);
     formData.append("coursePrice", input.coursePrice);
     formData.append("courseThumbnail", input.courseThumbnail);
-    await editCourse(formData).unwrap();
+    await editCourse({ formData, courseId }).unwrap();
+    console.log("Params from useParams:", params); // Should contain courseId
+    console.log("Extracted courseId:", courseId);
+
     navigate("/admin/course");
   };
 
@@ -83,6 +110,8 @@ const CourseTab = () => {
       toast.error("Something went wrong" || data.message);
     }
   }, [isSuccess, isError]);
+
+  if (courseByIdLoading) return <Loader2 className="h-4 w-4 animate-spin" />;
   return (
     <div className="h-full overflow-y-auto ">
       <Card>
@@ -118,10 +147,10 @@ const CourseTab = () => {
               <Label>Subtitle</Label>
               <Input
                 type="text"
-                name="subTitle"
+                name="courseSubtitle"
                 placeholder="Enter course title"
                 onChange={changeHandler}
-                value={input.subTitle}
+                value={input.courseSubtitle}
               />
             </div>
             <div>
@@ -146,9 +175,9 @@ const CourseTab = () => {
                     <SelectValue placeholder="Level" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="beginner">Beginner</SelectItem>
-                    <SelectItem value="intermediate">Intermediate</SelectItem>
-                    <SelectItem value="advance">Advance</SelectItem>
+                    <SelectItem value="Beginner">Beginner</SelectItem>
+                    <SelectItem value="Intermediate">Intermediate</SelectItem>
+                    <SelectItem value="Advance">Advance</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

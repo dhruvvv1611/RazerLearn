@@ -46,36 +46,36 @@ export const getCreatorCourses = async (req, res) => {
 
 export const editCourse = async (req, res) => {
   try {
-    const courseId = req.params.id;
+    const courseId = req.params.courseId;
     const {
       courseTitle,
-      subtitle,
+      courseSubtitle,
       description,
       category,
       courseLevel,
       coursePrice,
     } = req.body;
-
     const thumbnail = req.file;
 
     let course = await Course.findById(courseId);
     if (!course) {
-      return res
-        .status(404)
-        .json({ message: "Course not found", success: false });
+      return res.status(404).json({
+        message: "Course not found!",
+      });
     }
     let courseThumbnail;
     if (thumbnail) {
       if (course.courseThumbnail) {
         const publicId = course.courseThumbnail.split("/").pop().split(".")[0];
-        await deleteMedia(publicId);
+        await deleteMedia(publicId); // delete old image
       }
+      // upload a thumbnail on clourdinary
       courseThumbnail = await uploadMedia(thumbnail.path);
     }
 
     const updateData = {
       courseTitle,
-      subtitle,
+      courseSubtitle,
       description,
       category,
       courseLevel,
@@ -87,11 +87,34 @@ export const editCourse = async (req, res) => {
       new: true,
     });
 
-    return res.status(200).json({ course, message: "Course updated" });
+    return res.status(200).json({
+      course,
+      message: "Course updated successfully.",
+    });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ message: "Failed to edit course", success: false });
+    return res.status(500).json({
+      message: "Failed to create course",
+    });
+  }
+};
+
+export const getCourseById = async (req, res) => {
+  try {
+    const courseId = req.params.courseId;
+    const course = await Course.findById(courseId);
+
+    if (!course) {
+      res.status(404).json({
+        message: "Course not found",
+      });
+    }
+
+    res.status(201).json({
+      course,
+    });
+  } catch (error) {
+    console.error("Error fetching course:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
