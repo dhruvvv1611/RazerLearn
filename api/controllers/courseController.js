@@ -1,5 +1,6 @@
 import Course from "../models/courseModel.js";
 import { deleteMedia, uploadMedia } from "../utils/cloudinary.js";
+import Lecture from "../models/lectureModel.js";
 
 export const createCourse = async (req, res) => {
   try {
@@ -116,5 +117,59 @@ export const getCourseById = async (req, res) => {
   } catch (error) {
     console.error("Error fetching course:", error);
     res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const createLecture = async (req, res) => {
+  try {
+    const { lectureTitle } = req.body;
+    const courseId = req.params.courseId; // Correctly extract courseId from params
+
+    if (!lectureTitle || !courseId) {
+      return res.status(400).json({ message: "Please fill in all fields" });
+    }
+
+    // Validate the course first
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({
+        message: "Course not found",
+      });
+    }
+
+    // Create the lecture
+    const lecture = await Lecture.create({
+      lectureTitle,
+      course: courseId, // Associate with the course
+    });
+
+    // Add lecture ID to the course's lectures array
+    course.lectures.push(lecture._id);
+    await course.save();
+
+    res.status(201).json({ lecture, message: "Lecture created successfully" });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Failed to create lecture", success: false });
+  }
+};
+
+export const getLecture = async (req, res) => {
+  try {
+    const courseId = req.params.courseId;
+
+    const course = await Course.findById(courseId).populate("lectures");
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    return res.status(200).json({ lecture: course.lectures });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Failed to fetch lecture", success: false });
   }
 };
