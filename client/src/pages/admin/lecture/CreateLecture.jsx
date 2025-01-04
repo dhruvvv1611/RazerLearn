@@ -24,13 +24,14 @@ const CreateLecture = () => {
     data: lectureData,
     isLoading: lectureLoading,
     isError: lectureError,
+    refetch,
   } = useGetCourseLectureQuery(courseId);
 
   console.log(lectureData);
 
   const createLectureHandler = async () => {
     try {
-      await createLecture({ lectureTitle, courseId }).unwrap(); // Unwrap ensures error is caught
+      await createLecture({ lectureTitle, courseId }).unwrap();
     } catch (error) {
       console.error("Error creating lecture:", error);
     }
@@ -39,7 +40,8 @@ const CreateLecture = () => {
   useEffect(() => {
     if (isSuccess) {
       toast.success("Lecture created successfully");
-      setLectureTitle(""); // Clear the input field on success
+      setLectureTitle("");
+      refetch();
     }
     if (isError) {
       toast.error("Failed to create lecture");
@@ -90,7 +92,7 @@ const CreateLecture = () => {
           ) : lectureData?.lecture?.length === 0 ? (
             <p>No lectures uploaded yet.</p>
           ) : (
-            lectureData?.lecture?.map((lecture,index) => (
+            lectureData?.lecture?.map((lecture, index) => (
               <Lecture
                 key={lecture._id}
                 lecture={lecture}
