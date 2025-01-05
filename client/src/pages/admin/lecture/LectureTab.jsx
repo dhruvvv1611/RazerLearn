@@ -10,13 +10,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
-import { useEditLecutreMutation } from "@/features/api/courseApi";
+import {
+  useEditLecutreMutation,
+  useRemoveLectureMutation,
+  useGetLectureByIdQuery,
+} from "@/features/api/courseApi";
 import axios from "axios";
 import React, { useEffect } from "react";
 import { toast } from "sonner";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 
 const LectureTab = () => {
+  const navigate = useNavigate();
   const [lectureTitle, setLectureTitle] = React.useState("");
   const [uploadVideoInfo, setUploadVideoInfo] = React.useState(null);
   const [isFree, setIsFree] = React.useState(false);
@@ -26,6 +32,16 @@ const LectureTab = () => {
   const { courseId, lectureId } = useParams();
 
   const media_api = "http://localhost:3000/api/v1/media";
+
+  const { data: lectureData } = useGetLectureByIdQuery(lectureId);
+  console.log(lectureData);
+
+  useEffect(() => {
+    if (lectureData) {
+      setLectureTitle(lectureData?.lecture?.lectureTitle);
+      setIsFree(lectureData?.lecture?.isPreviewFree);
+    }
+  }, [lectureData, lectureId]);
 
   const fileChangeHandler = async (e) => {
     const file = e.target.files[0];
@@ -63,6 +79,15 @@ const LectureTab = () => {
   const [editLecture, { isLoading, isError, isSuccess }] =
     useEditLecutreMutation();
 
+  const [
+    removeLecture,
+    {
+      isLoading: removeLoading,
+      isError: removeError,
+      isSuccess: removeSuccess,
+    },
+  ] = useRemoveLectureMutation();
+
   const updateLecture = async () => {
     try {
       await editLecture({
@@ -84,7 +109,22 @@ const LectureTab = () => {
     if (isError) {
       toast.error("Failed to update lecture");
     }
-  }, [isSuccess, isError]);
+    if (removeSuccess) {
+      toast.success("Lecture removed successfully");
+      navigate(`/admin/course/edit/${courseId}/lecture`);
+    }
+    if (removeError) {
+      toast.error("Failed to remove lecture");
+    }
+  }, [isSuccess, isError, removeSuccess, removeError]);
+
+  const removeLectureHandler = async () => {
+    try {
+      await removeLecture({ courseId, lectureId }).unwrap();
+    } catch (error) {
+      console.error("Error removing lecture:", error);
+    }
+  };
 
   return (
     <Card>
@@ -94,8 +134,20 @@ const LectureTab = () => {
           <CardDescription>Make Changes and Upload Your Course</CardDescription>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="destructive" className="w-fit h-9">
-            Remove Lecture
+          <Button
+            variant="destructive"
+            className="w-fit h-9"
+            onClick={removeLectureHandler}
+            disabled={removeLoading}
+          >
+            {removeLoading ? (
+              <div className="flex items-center gap-2">
+                Loading...
+                <Loader2 className="w-4 h-4 animate-spin" />
+              </div>
+            ) : (
+              "Remove Lecture"
+            )}
           </Button>
         </div>
       </CardHeader>

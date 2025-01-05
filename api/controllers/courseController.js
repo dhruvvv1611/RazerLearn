@@ -1,6 +1,7 @@
 import Course from "../models/courseModel.js";
 import { deleteMedia, deleteVideo, uploadMedia } from "../utils/cloudinary.js";
 import Lecture from "../models/lectureModel.js";
+import mongoose from "mongoose";
 
 export const createCourse = async (req, res) => {
   try {
@@ -215,30 +216,36 @@ export const editLecture = async (req, res) => {
 export const removeLecture = async (req, res) => {
   try {
     const { lectureId } = req.params;
+
     const lecture = await Lecture.findByIdAndDelete(lectureId);
     if (!lecture) {
       return res.status(404).json({
         message: "Lecture not found!",
       });
     }
-    // delete the lecture from couldinary as well
+
+    // Rest of the logic
     if (lecture.publicId) {
-      await deleteVideo(lecture.publicId);
+      try {
+        await deleteVideo(lecture.publicId);
+      } catch (cloudinaryError) {
+        console.error("Error deleting video from Cloudinary:", cloudinaryError);
+      }
     }
 
-    // Remove the lecture reference from the associated course
     await Course.updateOne(
-      { lectures: lectureId }, // find the course that contains the lecture
-      { $pull: { lectures: lectureId } } // Remove the lectures id from the lectures array
+      { lectures: lectureId },
+      { $pull: { lectures: lectureId } }
     );
 
     return res.status(200).json({
       message: "Lecture removed successfully.",
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error removing lecture:", error);
     return res.status(500).json({
-      message: "Failed to remove lecture",
+      message: "Failed to remove lecture.",
+      error: error.message,
     });
   }
 };
@@ -259,6 +266,41 @@ export const getLectureById = async (req, res) => {
     console.log(error);
     return res.status(500).json({
       message: "Failed to get lecture by id",
+    });
+  }
+};
+
+export const togglePublishCourse = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const { publish } = req.query;
+
+    // Check if courseId is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(courseId)) {
+      return res.status(400).json({
+        message: "Invalid Course ID",
+      });
+    }
+
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({
+        message: "Course not found!",
+      });
+    }
+
+    // Update publish status
+    course.isPublished = publish === "true";
+    await course.save();
+
+    const statusMessage = course.isPublished ? "Published" : "Unpublished";
+    return res.status(200).json({
+      message: `Course is ${statusMessage}`,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Failed to update course status",
     });
   }
 };

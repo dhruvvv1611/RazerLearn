@@ -29,7 +29,9 @@ const CourseTable = () => {
   if (!data?.courses?.length) {
     return (
       <div className="text-center mt-6">
-        <p className="text-gray-500">No courses found. Start by creating a new course!</p>
+        <p className="text-gray-500">
+          No courses found. Start by creating a new course!
+        </p>
         <Button onClick={() => navigate(`create`)}>Create A New Course</Button>
       </div>
     );
@@ -57,8 +59,15 @@ const CourseTable = () => {
                 {course?.coursePrice || "NA"}
               </TableCell>
               <TableCell>
-                <Badge>{course?.isPublished ? "Published" : "Draft"}</Badge>
+                <Badge
+                  className={
+                    course?.isPublished ? "bg-green-500" : "bg-red-700"
+                  }
+                >
+                  {course?.isPublished ? "Published" : "Draft"}
+                </Badge>
               </TableCell>
+
               <TableCell>{course?.courseTitle}</TableCell>
               <TableCell className="text-right">
                 <Button

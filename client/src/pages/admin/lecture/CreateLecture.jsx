@@ -27,8 +27,6 @@ const CreateLecture = () => {
     refetch,
   } = useGetCourseLectureQuery(courseId);
 
-  console.log(lectureData);
-
   const createLectureHandler = async () => {
     try {
       await createLecture({ lectureTitle, courseId }).unwrap();

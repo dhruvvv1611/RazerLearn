@@ -19,6 +19,7 @@ import {
 import {
   useEditCourseMutation,
   useGetCourseByIdQuery,
+  usePublishCourseMutation,
 } from "@/features/api/courseApi";
 import { Loader2 } from "lucide-react";
 import React, { useEffect } from "react";
@@ -29,10 +30,11 @@ const CourseTab = () => {
   const params = useParams();
   const courseId = params.courseId;
 
+  const [publishCourse, { data: publishData }] = usePublishCourseMutation();
+
   const [editCourse, { data, isError, isLoading, isSuccess }] =
     useEditCourseMutation();
   const navigate = useNavigate();
-  const isPublished = true;
   const [input, setInput] = React.useState({
     courseTitle: "",
     courseSubtitle: "",
@@ -42,8 +44,11 @@ const CourseTab = () => {
     coursePrice: "",
   });
 
-  const { data: courseByIdData, isLoading: courseByIdLoading } =
-    useGetCourseByIdQuery(courseId);
+  const {
+    data: courseByIdData,
+    isLoading: courseByIdLoading,
+    refetch,
+  } = useGetCourseByIdQuery(courseId);
 
   useEffect(() => {
     if (courseByIdData?.course) {
@@ -112,6 +117,21 @@ const CourseTab = () => {
   }, [isSuccess, isError]);
 
   if (courseByIdLoading) return <Loader2 className="h-4 w-4 animate-spin" />;
+
+  const publishHandler = async (action) => {
+    try {
+      const response = await publishCourse({
+        courseId, // courseId from useParams
+        query: action, // 'true' or 'false'
+      }).unwrap();
+      toast.success(response.message || "Course status updated successfully");
+      refetch();
+    } catch (error) {
+      console.error("Error in publishHandler:", error);
+      toast.error(error?.data?.message || "Something went wrong");
+    }
+  };
+
   return (
     <div className="h-full overflow-y-auto ">
       <Card>
@@ -125,9 +145,29 @@ const CourseTab = () => {
             </CardDescription>
           </div>
           <div className="flex flex-row space-x-4">
-            <Button variant="outline">
-              {isPublished ? "Unpublish" : "Publish"}
+            <Button
+              variant="outline"
+              disabled={
+                courseByIdData?.course.lectures.length === 0 || isLoading
+              }
+              onClick={() =>
+                publishHandler(
+                  courseByIdData?.course?.isPublished ? "false" : "true"
+                )
+              }
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Processing...
+                </>
+              ) : courseByIdData?.course?.isPublished ? (
+                "Unpublish"
+              ) : (
+                "Publish"
+              )}
             </Button>
+
             <Button>Remove Course</Button>
           </div>
         </CardHeader>
@@ -170,9 +210,12 @@ const CourseTab = () => {
               </div>
               <div>
                 <Label>Course Level</Label>
-                <Select onValueChange={selectCourseLevel}>
+                <Select
+                  onValueChange={selectCourseLevel}
+                  value={input.courseLevel}
+                >
                   <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Level" />
+                    <SelectValue placeholder={input.courseLevel || "Level"} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Beginner">Beginner</SelectItem>
