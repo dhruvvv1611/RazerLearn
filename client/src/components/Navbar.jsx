@@ -29,7 +29,6 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-
 const Navbar = () => {
   const navigate = useNavigate();
   const [logoutUser, { data, isSuccess }] = useLogoutUserMutation();
@@ -45,7 +44,7 @@ const Navbar = () => {
     }
   }, [isSuccess, data]);
 
-  const {user} = useSelector((store)=> store.auth);
+  const { user } = useSelector((store) => store.auth);
   console.log(user);
 
   return (
@@ -58,7 +57,7 @@ const Navbar = () => {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Avatar>
+                <Avatar className="cursor-pointer">
                   <AvatarImage
                     src={user?.photoUrl || "https://github.com/shadcn.png"}
                     alt="@shadcn"
@@ -85,7 +84,9 @@ const Navbar = () => {
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
-                      <h1>Dashboard</h1>
+                      <Link to="/admin/dashboard">
+                        <h1>Dashboard</h1>
+                      </Link>
                     </DropdownMenuItem>
                   </>
                 )}
@@ -93,8 +94,12 @@ const Navbar = () => {
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-2">
-              <Link to="/login"><Button variant="outline">Login</Button></Link>
-              <Link to="/login"><Button>Register</Button></Link>
+              <Link to="/login">
+                <Button variant="outline">Login</Button>
+              </Link>
+              <Link to="/login">
+                <Button>Register</Button>
+              </Link>
             </div>
           )}
           <DarkMode />
@@ -115,7 +120,6 @@ const MobileNavbar = () => {
   const logoutHandler = async () => {
     await logoutUser();
   };
-  
 
   return (
     <Sheet>
