@@ -1,3 +1,4 @@
+import BuyCourseButton from "@/components/BuyCourseButton";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,9 +11,12 @@ import {
 import { SelectSeparator } from "@/components/ui/select";
 import { BadgeInfo, Lock, PlayCircle } from "lucide-react";
 import React from "react";
+import { useParams } from "react-router-dom";
 
 const CourseDetail = () => {
-  const purchased = true;
+  const purchased = false;
+  const params = useParams();
+  const courseId = params.courseId;
   return (
     <div className="mt-20 space-y-3 ">
       <div className="bg-[#2d2f31] text-white">
@@ -73,7 +77,11 @@ const CourseDetail = () => {
               <h1 className="text-lg md:text-xl font-semibold">Course Price</h1>
             </CardContent>
             <CardFooter className="flex justify-center p-4">
-              <Button className="w-full">{purchased ? "Continue Learning" : "Buy Now"}</Button>
+              {purchased ? (
+                <Button className="w-full">Go to Course</Button>
+              ) : (
+                <BuyCourseButton courseId={courseId} className="w-full" />
+              )}
             </CardFooter>
           </Card>
         </div>

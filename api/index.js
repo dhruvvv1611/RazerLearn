@@ -6,6 +6,7 @@ import connectDB from "./database/db.js";
 import userRoute from "./routes/userRoute.js";
 import courseRoute from "./routes/courseRoute.js";
 import mediaRoute from "./routes/mediaRoute.js";
+import coursePurchaseRoute from "./routes/coursePurchaseRoute.js";
 
 dotenv.config();
 connectDB();
@@ -22,6 +23,7 @@ app.use(
 app.use("/api/v1/media", mediaRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/course", courseRoute);
+app.use("/api/v1/purchase", coursePurchaseRoute);
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(
