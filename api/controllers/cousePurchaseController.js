@@ -2,6 +2,7 @@ import Course from "../models/courseModel.js";
 import CoursePurchase from "../models/purchasedCoursesModel.js";
 import Lecture from "../models/lectureModel.js";
 import User from "../models/userModel.js";
+import mongoose from "mongoose";
 
 export const createCoursePurchase = async (req, res) => {
   try {
@@ -71,17 +72,23 @@ export const createCoursePurchase = async (req, res) => {
 export const getCourseDetailWithPurchaseStatus = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const userId = req.id;
+
+    if (!courseId || courseId === "undefined") {
+      return res.status(400).json({ message: "Invalid or missing courseId in request." });
+    }
 
     const course = await Course.findById(courseId)
       .populate({ path: "creator" })
       .populate({ path: "lectures" });
 
-    const purchased = await CoursePurchase.findOne({ userId, courseId });
-
     if (!course) {
       return res.status(404).json({ message: "Course not found!" });
     }
+
+    const purchased = await CoursePurchase.findOne({
+      userId: req.id,
+      courseId,
+    });
 
     return res.status(200).json({
       course,
@@ -92,6 +99,8 @@ export const getCourseDetailWithPurchaseStatus = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+
 
 export const getAllPurchasedCourse = async (_, res) => {
   try {

@@ -19,6 +19,10 @@ const BuyCourseButton = ({ courseId }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const purchaseHandler = async () => {
+    if (!courseId) {
+      alert("Invalid course ID. Please try again.");
+      return;
+    }
     try {
       await createCoursePurchase({ courseId }).unwrap();
       alert("Course purchased successfully!");

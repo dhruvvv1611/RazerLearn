@@ -16,14 +16,6 @@ export const purchaseApi = createApi({
         body: { courseId },
       }),
     }),
-    // Mutation to mark a course purchase as completed
-    completeCoursePurchase: builder.mutation({
-      query: ({ purchaseId }) => ({
-        url: "/purchase/complete", // Endpoint for completing a purchase
-        method: "POST",
-        body: { purchaseId },
-      }),
-    }),
     // Query to fetch all purchased courses
     fetchPurchasedCourses: builder.query({
       query: () => ({
@@ -33,7 +25,7 @@ export const purchaseApi = createApi({
     }),
     // Query to fetch course details with purchase status
     fetchCourseDetailWithStatus: builder.query({
-      query: ({ courseId }) => ({
+      query: ( courseId ) => ({
         url: `/course/${courseId}/detail-with-status`, // Fetch details for a specific course
         method: "GET",
       }),
@@ -43,7 +35,6 @@ export const purchaseApi = createApi({
 
 export const {
   useCreateCoursePurchaseMutation,
-  useCompleteCoursePurchaseMutation,
   useFetchPurchasedCoursesQuery,
   useFetchCourseDetailWithStatusQuery,
 } = purchaseApi;
