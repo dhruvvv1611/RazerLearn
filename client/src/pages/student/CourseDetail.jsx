@@ -70,7 +70,9 @@ const CourseDetail = () => {
           <Card>
             <CardHeader>
               <CardTitle>Course Content</CardTitle>
-              <CardDescription>{course?.lectures?.length} Lectures</CardDescription>
+              <CardDescription>
+                {course?.lectures?.length} Lectures
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {course?.lectures.map((lecture, index) => (
@@ -99,7 +101,10 @@ const CourseDetail = () => {
                 {course?.lectures[0]?.lectureTitle}
               </h1>
               <SelectSeparator className="my-2 " />
-              <h1 className="text-lg md:text-xl font-semibold flex items-center" ><IndianRupee size={18}/>{course?.coursePrice}</h1>
+              <h1 className="text-lg md:text-xl font-semibold flex items-center">
+                <IndianRupee size={18} />
+                {course?.coursePrice}
+              </h1>
             </CardContent>
             <CardFooter className="flex justify-center p-4">
               {purchased ? (
